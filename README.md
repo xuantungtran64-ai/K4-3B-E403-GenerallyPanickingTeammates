@@ -9,7 +9,7 @@
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
 | Trần Xuân Tùng | 2A202602787 | backend | lên ý tưởng, thiết kế pipeline, xử lý backend |
-| Trần Quốc Vượng | 2A202602522 |  | frontend | thiết kế, xử lý giao diện người dùng |
+| Trần Quốc Vượng | 2A202602522 | frontend | thiết kế, xử lý giao diện người dùng |
 | Nguyễn Hoàng Tuyên | 2A202602439 | backend | xử lý backend, thu thập dữ liệu người dùng qua khảo sát |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
