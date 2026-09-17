@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sơ đồ luồng Q&A Radar</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background-color: #f8fafc; }
+        .mermaid { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="mermaid">
+        flowchart TD
+            classDef system fill:#1e293b,stroke:#334155,color:#fff
+            classDef ai fill:#0ea5e9,stroke:#0284c7,color:#fff,stroke-width:2px
+            classDef user fill:#10b981,stroke:#059669,color:#fff,stroke-width:2px
+
+            subgraph Data_Pipeline [1. Hệ thống lấy dữ liệu]
+                A[("VLearn / Discord")] -->|"Polling 30s"| B["Hàng đợi tin nhắn"]
+            end
+
+            subgraph AI_Backend [2. AI Xử lý ngầm]
+                B --> C{"Là câu hỏi?"}
+                C -->|"Không"| D["Thùng rác"]
+                C -->|"Có"| E["Mã hóa thành<br>Embedded Vector"]
+                
+                E --> F{"Trùng cụm cũ?"}
+                F -->|"Trùng"| G["Cộng dồn Count<br>vào Cụm cũ"]
+                G --> G2["Tính lại Total Score"]
+                
+                F -->|"Mới"| H["Tạo Cụm mới"]
+                H --> I["Gọi LLM phân loại<br>Taxonomy Level"]
+                I --> J["Tính Hybrid Score<br>(Base + Similarity)"]
+                J --> J2["Tính Total Score"]
+                
+                G2 --> K["Cập nhật Database"]
+                J2 --> K
+            end
+
+            subgraph Frontend_UI [3. Giao diện Giảng viên]
+                K -->|"Xếp theo điểm"| L["Hiện Top 5 Câu hỏi"]
+                L --> M(("Giảng viên"))
+                
+                M -->|"Bấm View All"| N["Hiện câu gốc"]
+                M -->|"Bấm Hide"| O["Ẩn khỏi màn hình"]
+                M -->|"Bấm Send TA"| P["Chuyển cho TA"]
+                M -->|"Bấm Done"| Q["Đã trả lời xong"]
+                
+                O --> L
+                P --> L
+                Q --> L
+            end
+
+            class A,B,D system
+            class C,E,F,G,G2,H,I,J,J2,K ai
+            class L,M,N,O,P,Q user
+    </div>
+</body>
+</html>
+

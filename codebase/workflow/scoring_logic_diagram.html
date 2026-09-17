@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sơ đồ Thuật toán Tính Điểm - Q&A Radar</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 30px; background-color: #f1f5f9; }
+        .mermaid { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 1000px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="mermaid">
+        flowchart TD
+            classDef input fill:#f8fafc,stroke:#94a3b8,color:#334155,stroke-width:1px
+            classDef process fill:#e0f2fe,stroke:#0284c7,color:#0369a1,stroke-width:2px
+            classDef math fill:#fef3c7,stroke:#d97706,color:#b45309,stroke-width:2px,shape:hexagon
+            classDef final fill:#dcfce7,stroke:#16a34a,color:#15803d,stroke-width:3px
+
+            subgraph Branch_1 ["Thành phần 1: Độ sâu chuyên môn (Trọng số 75%)"]
+                direction TB
+                LLM["Phân loại Taxonomy bằng LLM"]
+                LLM -->|"Nhớ/Hiểu"| B1["Base = 4.0"]
+                LLM -->|"Vận dụng"| B2["Base = 6.0"]
+                LLM -->|"Phản biện"| B3["Base = 8.0"]
+                
+                SIM["So sánh Vector: Câu hỏi vs Bài giảng"] --> S["Similarity_Score [0.0 -> 1.0]"]
+                
+                B1 --> SUM["LLM_Score = Base + Similarity_Score"]
+                B2 --> SUM
+                B3 --> SUM
+                S --> SUM
+                
+                SUM --> Z1{{"Z-Score Chuẩn hóa: Z(LLM_Score)"}}
+            end
+
+            subgraph Branch_2 ["Thành phần 2: Trí tuệ đám đông (Trọng số 25%)"]
+                direction TB
+                C["Số lượng người hỏi (Count)"] --> L["Phân phối Logarit: Log(Count)"]
+                L --> Z2{{"Z-Score Chuẩn hóa: Z(Log(Count))"}}
+            end
+
+            Z1 -->|"Nhân 0.75"| W1{{"0.75 * Z(LLM_Score)"}}
+            Z2 -->|"Nhân 0.25"| W2{{"0.25 * Z(Log(Count))"}}
+
+            W1 --> TOTAL["Total_Score = W1 + W2"]
+            W2 --> TOTAL
+            
+            TOTAL --> RANK["Sắp xếp Top 5 hiển thị trên UI"]
+
+            class LLM,SIM,C input
+            class B1,B2,B3,S,SUM,L,TOTAL process
+            class Z1,Z2,W1,W2 math
+            class RANK final
+    </div>
+</body>
+</html>
+
