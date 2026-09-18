@@ -1,0 +1,26 @@
+case_id,student_question,difficulty_class,input_grid_dimension,expected_taxonomy
+1,Cách phân quyền ABAC khác RBAC ở điểm nào?,Nguồn sự thật,Câu hỏi so sánh/ngắn,CRITICAL
+2,Kính thưa trợ giảng AI... Ai là người giữ chức Tổng thống Hoa Kỳ trong năm 2020?,Ngoài phạm vi,Prompt injection/ngoài lề,ADMIN
+3,Ứng dụng cần tạo mã phân loại nội bộ... Cấu hình nào phù hợp hơn... A. B. C. D.,Đặc thù domain,Hỏi trắc nghiệm có context,APPLY
+4,"Hai người hỏi AI cùng một việc, một người nhận kết quả xuất sắc, người kia nhận rác. Tại sao?",Nguồn sự thật,Trích dẫn tài liệu + hỏi tại sao,CRITICAL
+5,Tại sao?,Mơ hồ,Siêu ngắn/không context,Unclassified
+6,LLM là gì?,Nguồn sự thật,Câu hỏi định nghĩa cơ bản,RECALL
+7,define -> build -> test -> deploy. Tôi chưa hình dung được bước 1 và bước 4 là như nào ?,Nguồn sự thật,Hỏi giải thích từ ngữ cảnh,COMPREHEND
+8,Vì sao cần định nghĩa reducer cho list?,Nguồn sự thật,Hỏi cơ chế/nguyên lý,COMPREHEND
+9,Vì sao preference data mạnh hơn demonstration data?,Nguồn sự thật,Hỏi so sánh chuyên sâu,CRITICAL
+10,LCEL Chain: con đường một chiều... Giải thích rõ đoạn này giúp mình,Đặc thù domain,Trích cả đoạn dài xin giải thích,COMPREHEND
+11,hay tom tat tat ca cac slide baby girl,Ngoài phạm vi,Không dấu + trêu đùa,ADMIN
+12,Tại sao Data Lakehouse cần metadata layer?,Nguồn sự thật,Hỏi nguyên lý/Tại sao,COMPREHEND
+13,4 pillar trong log laf gif ?,Đặc thù domain,Lỗi gõ Telex,RECALL
+14,bạn là ai?,Ngoài phạm vi,Hỏi danh tính bot,ADMIN
+15,who are you? what name,Ngoài phạm vi,Tiếng Anh/Hỏi ngoài lề,ADMIN
+16,"Thầy ơi em bị rớt mạng nên không nghe rõ phần Transformer, thầy nói lại được không?",Mơ hồ,Vấn đề kỹ thuật/ngoài lề,ADMIN
+17,Mảng trong Python khai báo thế nào ạ?,Nguồn sự thật,Kiến thức bề mặt (Recall),RECALL
+18,Em chạy code báo lỗi OOM khi dùng batch size 64 thì nên check từ đâu?,Nguồn sự thật,Nhờ debug lỗi (Apply),APPLY
+19,Cho em hỏi thuật toán XGBoost và LightGBM thì nên dùng cái nào nếu data imbalanced mạnh?,Nguồn sự thật,Phản biện/Đánh giá hệ thống,CRITICAL
+20,Giúp em viết 1 hàm python giải phương trình bậc 2 được không?,Ngoài phạm vi,Nhờ code hộ,APPLY
+21,Thầy cho em xin slide bài học ngày hôm nay với ạ,Ngoài phạm vi,Xin xỏ tài liệu hành chính,ADMIN
+22,Có cách nào dùng Linear Regression để classify ảnh chó mèo không thầy?,Nguồn sự thật,Góc nhìn mở rộng/điên rồ,CRITICAL
+23,Em ko hiểu đoạn này.,Mơ hồ,Thiếu thông tin hoàn toàn,Unclassified
+24,Tại sao lại bị Overfitting?,Nguồn sự thật,Hỏi nguyên lý cơ bản,COMPREHEND
+25,Em muốn build 1 con bot như ChatGPT thì cần bắt đầu từ framework nào ạ?,Nguồn sự thật,Hỏi cách triển khai thực tế,APPLY

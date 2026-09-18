@@ -176,7 +176,11 @@ def lecture_similarity(lecture_vectors, cluster):
         return 0.0
 
     cluster_vector = np.array(cluster_vector)
-    lecture_matrix = np.array(lecture_vectors)
+    
+    if isinstance(lecture_vectors[0], dict) and 'embedding' in lecture_vectors[0]:
+        lecture_matrix = np.array([item['embedding'] for item in lecture_vectors])
+    else:
+        lecture_matrix = np.array(lecture_vectors)
     
     similarities = cosine_similarity_matrix(cluster_vector, lecture_matrix)
 

@@ -5,6 +5,7 @@ import Q_tools as Qt
 from Q_tools import ChatDataIngestor as CDI
 import S_tools as St
 from datetime import datetime, timedelta
+import os
 
 def Q_filter(messages, LLM_filter=True, candidate_Bsize=10):
     valid_questions = [] 
@@ -66,12 +67,17 @@ def LLM_cluster(clusters):
 
 
 class main:
-    def __init__(self,data_path,current_simulated_time,LLM_Qfilter =True):
+    def __init__(self,data_path,current_simulated_time,LLM_Qfilter =True, pdf_path = None):
         self.data_path = data_path
         self.current_simulated_time = current_simulated_time
         self.LLM_Qfilter = LLM_Qfilter
         self.clusters = []
         self.data_ingestor = CDI(data_path)
+        
+        # 1. Trích xuất text từ PDF
+        lecture_text = St.PDF_EXTRACT(pdf_path) if pdf_path else ""
+        # 2. Sinh embedding vector từ text
+        self.lecture_vectors = St.material_embedding(lecture_text) if lecture_text else []
         
         
     def main(self):
@@ -91,7 +97,7 @@ class main:
                         Q_cluster(self.clusters, embedded_Q, threshold=0.85)
                         LLM_cluster(self.clusters)
                         print(f"chấm điểm")
-                        Qt.scoring(self.clusters, lecture_vectors = None)
+                        Qt.scoring(self.clusters, lecture_vectors = self.lecture_vectors)
 
                     except Exception as e:
                         print(f"Lỗi khi xử lý tin nhắn: {e}")
@@ -100,22 +106,55 @@ class main:
                 else:
                     print("there is no new message")
 
-                print("\n--- TOP 5 CÂU HỎI ĐẮT GIÁ ---")
+                print("\n" + "="*50)
+                print("🌟 TOP CÂU HỎI ĐẮT GIÁ HIỆN TẠI 🌟")
+                print("="*50)
                 for i, c in enumerate(self.clusters[:5]):
-                    print(f"Top {i+1} [{c.get('final_score', 0)}đ]: {c['representative_msg']['text']}")
+                    print(f"[{i+1}] ({c.get('final_score', 0)}đ | {c.get('count', 1)} người hỏi | {c.get('taxonomy_level', 'Unclassified')})")
+                    print(f"    -> {c['representative_msg']['text']}\n")
+
+                print("-" * 50)
+                print("Hành động:")
+                print(" - Gõ [1, 2, 3...] để đánh dấu ĐÃ TRẢ LỜI (xóa khỏi danh sách).")
+                print(" - Gõ [t1, t2, t3...] để GỬI CHO TRỢ GIẢNG (TA) hỗ trợ.")
+                print(" - Bấm phím [Enter] để lướt qua (quét tiếp 30s tin nhắn mới).")
+                
+                user_input = input("\nLựa chọn của bạn: ").strip().lower()
+                
+                if user_input:
+                    try:
+                        if user_input.startswith('t'):
+                            idx = int(user_input[1:]) - 1
+                            if 0 <= idx < len(self.clusters):
+                                msg = self.clusters[idx]['representative_msg']['text']
+                                print(f"\n[!] ĐÃ GỬI CHO TA: '{msg}'")
+                                self.clusters.pop(idx)
+                            else:
+                                print("Số không hợp lệ!")
+                        else:
+                            idx = int(user_input) - 1
+                            if 0 <= idx < len(self.clusters):
+                                msg = self.clusters[idx]['representative_msg']['text']
+                                print(f"\n[v] ĐÃ TRẢ LỜI: '{msg}'")
+                                self.clusters.pop(idx)
+                            else:
+                                print("Số không hợp lệ!")
+                    except ValueError:
+                        print("Cú pháp không hợp lệ. Vui lòng nhập số (vd: 1) hoặc t+số (vd: t2).")
 
                 current_time += timedelta(seconds=30)
-                time.sleep(5) 
+                # Bỏ time.sleep(5) vì input() đã đóng vai trò chờ (blocking) rồi
 
         except KeyboardInterrupt:
             sys.exit(0)
 
 #CONFIG
-data_path = r'D:\vin\Hackathon_mini\banned\K4-3B-Day05-06-AI-Product-Hackathon-main\data\vlearn-pack\chatlog\tutor_turns.csv'
+data_path = os.path.join(os.path.dirname(__file__), '..', 'mock_tutor_turns.csv')
 current_simulated_time = '2026-07-23 15:20:00'
 LLM_Qfilter = True
+pdf_path = r'D:\vin\Hackathon_mini\banned\K4-3B-Day05-06-AI-Product-Hackathon-main\data\vlearn-pack\slides\d1-slide-hackathon.pdf'
 
 if __name__ == "__main__":
-    app = main(data_path,current_simulated_time,LLM_Qfilter)
+    app = main(data_path,current_simulated_time,LLM_Qfilter,pdf_path)
 
     app.main()
