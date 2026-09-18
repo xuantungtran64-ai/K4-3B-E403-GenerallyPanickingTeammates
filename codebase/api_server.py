@@ -92,48 +92,68 @@ def startup_event():
 # 3. CÁC API DÀNH CHO FRONTEND
 # ==========================================
 
-@app.get("/api/top-questions")
-def get_top_questions():
+@app.get("/api/questions")
+def get_questions():
     """
-    Frontend dùng Javascript gọi API này mỗi 2 giây.
-    Trả về Top 5 câu hỏi xuất sắc nhất.
+    Frontend dùng Javascript gọi API này để lấy toàn bộ danh sách câu hỏi.
     """
-    top_5_clean = []
-    for c in clusters[:5]:
-        top_5_clean.append({
-            "score": float(c.get("final_score", 0.0)),
+    results = []
+    # Đảm bảo list clusters được sắp xếp theo final_score giảm dần
+    sorted_clusters = sorted(clusters, key=lambda x: x.get('final_score', 0), reverse=True)
+    
+    for i, c in enumerate(sorted_clusters):
+        # Khởi tạo ID duy nhất cho frontend nếu chưa có
+        if "id" not in c:
+            c["id"] = f"c_{c['representative_msg']['turn_id']}_{i}"
+        
+        # Trạng thái hiển thị trên UI: active, resolved, hidden
+        if "ui_status" not in c:
+            c["ui_status"] = "active"
+
+        # Ánh xạ phân loại của backend (academic/trash) sang frontend (academic/admin)
+        q_type = "academic" if c.get("status") == "academic" else "admin"
+
+        total_score = float(c.get("final_score", 0.0))
+        llm_score = float(c.get("raw_llm_score", 0.0))
+        raw_msgs = [msg['text'] for msg in c.get("messages", [])]
+        tax = c.get("taxonomy_level", "Unclassified")
+
+        results.append({
+            "id": c["id"],
+            "main_question": str(c['representative_msg']['text']),
             "count": int(c.get("count", 1)),
-            "taxonomy_level": str(c.get("taxonomy_level", "Unclassified")),
-            "text": str(c['representative_msg']['text'])
+            "llm_score": round(llm_score, 1),
+            "total_score": round(total_score, 1),
+            "reason": f"Phân loại AI: {tax}",
+            "type": q_type,
+            "status": c["ui_status"],
+            "raw_messages": raw_msgs,
+            "taxonomy_level": tax
         })
         
     return {
         "time_hien_tai": current_simulated_time.strftime("%H:%M:%S"),
-        "top_5": top_5_clean
+        "clusters": results
     }
 
-@app.post("/api/action/remove/{index}")
-def mark_as_answered(index: int):
+@app.post("/api/action/{action_type}/{cluster_id}")
+def handle_action(action_type: str, cluster_id: str):
     """
-    Khi Giảng viên bấm nút "Đã Trả Lời" -> Frontend gọi API này
-    VD: POST /api/action/remove/0 (để xóa câu top 1)
+    Xử lý các hành động từ Giảng viên: resolve (đã trả lời), trash (ẩn rác), send-ta (gửi TA).
     """
-    if 0 <= index < len(clusters):
-        removed = clusters.pop(index)
-        return {"status": "success", "message": f"Đã xóa: {removed['representative_msg']['text']}"}
-    return {"status": "error", "message": "Index không hợp lệ"}
-
-@app.post("/api/action/send-ta/{index}")
-def send_to_ta(index: int):
-    """
-    Khi Giảng viên bấm nút "Gửi Trợ Giảng" -> Frontend gọi API này
-    """
-    if 0 <= index < len(clusters):
-        removed = clusters.pop(index)
-        return {"status": "success", "message": f"Đã chuyển TA: {removed['representative_msg']['text']}"}
-    return {"status": "error", "message": "Index không hợp lệ"}
+    for c in clusters:
+        if c.get("id") == cluster_id:
+            if action_type == "resolve":
+                c["ui_status"] = "resolved"
+            elif action_type == "trash" or action_type == "hide":
+                c["ui_status"] = "hidden"
+            elif action_type == "send-ta":
+                c["ui_status"] = "resolved" # Đã gửi TA thì coi như xử lý xong trên màn hình GV
+            return {"status": "success", "message": f"Thực hiện thành công {action_type}."}
+    return {"status": "error", "message": "Không tìm thấy câu hỏi này."}
 
 if __name__ == "__main__":
-    print("🚀 API Server đang chạy. Frontend hãy gọi tới http://localhost:8000/api/top-questions")
+    print("🚀 API Server đang chạy. Dashboard UI hãy gọi tới http://localhost:8000/api/questions")
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 

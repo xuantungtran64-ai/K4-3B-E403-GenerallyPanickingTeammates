@@ -3,151 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Q&A Radar - Enterprise Dashboard</title>
+    <title>Live Q&A Radar - Dashboard</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom config for tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#121212',
+                        card: '#1e1e1e',
+                        primary: '#3b82f6',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Inter', system-ui, sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .tax-ADMIN { background: #475569; color: #f1f5f9; } /* Xám */
-        .tax-RECALL { background: #0284c7; color: #f0f9ff; } /* Xanh dương */
-        .tax-COMPREHEND { background: #16a34a; color: #f0fdf4; } /* Xanh lá */
-        .tax-APPLY { background: #ea580c; color: #fff7ed; } /* Cam */
-        .tax-CRITICAL { background: #dc2626; color: #fef2f2; } /* Đỏ */
-        .tax-Unclassified { background: #334155; color: #cbd5e1; }
-        
-        .pulse { animation: pulse-anim 2s infinite; }
-        @keyframes pulse-anim { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        body { background-color: #121212; color: #e5e7eb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .card-enter { animation: fade-in-up 0.4s ease-out forwards; }
+        @keyframes fade-in-up {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .tab-active { background-color: rgba(59, 130, 246, 0.15); color: #3b82f6; border-right: 3px solid #3b82f6; }
+        .tab-inactive { color: #9ca3af; }
+        .tab-inactive:hover { background-color: #1f2937; color: #e5e7eb; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 selection:bg-blue-500 selection:text-white">
+<body class="h-screen flex overflow-hidden selection:bg-primary selection:text-white">
 
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 glass-panel p-6 rounded-2xl shadow-2xl">
-            <div>
-                <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent flex items-center gap-3">
-                    <i class="fa-solid fa-radar text-blue-400"></i>Live Q&A Radar
-                </h1>
-                <p class="text-slate-400 mt-2 text-sm font-medium">Hệ thống Phân tích & Xếp hạng câu hỏi Thời gian thực</p>
-            </div>
-            <div class="mt-4 md:mt-0 text-right">
-                <div class="inline-flex items-center bg-slate-900 px-5 py-2 rounded-full border border-slate-700 shadow-inner">
-                    <div class="w-3 h-3 rounded-full bg-emerald-500 mr-3 pulse shadow-[0_0_10px_#10b981]"></div>
-                    <span class="font-mono text-2xl font-bold text-emerald-400 tracking-wider" id="sim-time">--:--:--</span>
+    <!-- Sidebar -->
+    <aside class="w-72 bg-card border-r border-gray-800 flex flex-col">
+        <div class="p-5 border-b border-gray-800">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-xl shadow-lg shadow-primary/30">
+                    <i class="fa-solid fa-radar fa-spin-pulse" style="color: white;"></i>
                 </div>
-                <p class="text-slate-500 text-xs mt-2 uppercase tracking-widest font-bold">Simulated Livestream Time</p>
+                <div>
+                    <h1 class="text-lg font-bold text-white tracking-wide">Q&A Radar</h1>
+                    <p class="text-xs text-green-400 font-semibold"><i class="fa-solid fa-circle-dot text-[8px] animate-pulse mr-1"></i>Live: Day 05</p>
+                </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="bg-dark rounded-xl p-3 border border-gray-800 text-center">
+                <p class="text-gray-400 text-xs mb-1">Thời gian giả lập</p>
+                <div class="text-2xl font-mono font-bold text-white tracking-wider" id="timer">--:--:--</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex-1 overflow-y-auto py-4">
+            <h2 class="px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Phân loại câu hỏi</h2>
+            
+            <button onclick="switchTab('academic')" id="tab-academic" class="w-full flex items-center justify-between px-5 py-3 tab-active text-left transition-colors">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-graduation-cap w-5 text-center"></i>
+                    <span class="font-medium">Chuyên môn (Top)</span>
+                </div>
+                <span class="bg-primary text-white text-xs py-0.5 px-2 rounded-full" id="count-academic">0</span>
+            </button>
+
+            <button onclick="switchTab('admin')" id="tab-admin" class="w-full flex items-center justify-between px-5 py-3 tab-inactive text-left transition-colors">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info w-5 text-center"></i>
+                    <span class="font-medium">Hành chính / Lề</span>
+                </div>
+                <span class="bg-gray-700 text-gray-300 text-xs py-0.5 px-2 rounded-full" id="count-admin">0</span>
+            </button>
+
+            <h2 class="px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-2">Lịch sử</h2>
+            
+            <button onclick="switchTab('resolved')" id="tab-resolved" class="w-full flex items-center justify-between px-5 py-3 tab-inactive text-left transition-colors">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-check-double w-5 text-center"></i>
+                    <span class="font-medium">Đã xử lý</span>
+                </div>
+                <span class="bg-success text-white text-xs py-0.5 px-2 rounded-full" id="count-resolved">0</span>
+            </button>
+        </nav>
+
+        <!-- Stats -->
+        <div class="p-5 border-t border-gray-800 text-sm">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-400">Tin nhắn nhận được:</span>
+                <span class="font-bold text-white" id="total-scanned">0</span>
+            </div>
+            <div class="flex justify-between items-center text-[10px] text-gray-500">
+                <span>Trạng thái máy chủ:</span>
+                <span id="server-status" class="text-success"><i class="fa-solid fa-check"></i> Đang chạy</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full bg-dark">
+        <!-- Header -->
+        <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-card shrink-0">
+            <h2 class="text-xl font-semibold text-white" id="main-title">Danh sách câu hỏi chuyên môn</h2>
+            <div class="flex gap-3">
+                <span class="px-4 py-2 text-gray-400 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-rotate animate-spin" style="animation-duration: 2s;"></i> Tự động làm mới
+                </span>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main>
-            <div class="flex justify-between items-end mb-6 px-2">
-                <h2 class="text-xl font-bold text-slate-200 flex items-center gap-2">
-                    <i class="fa-solid fa-fire text-orange-500"></i> Bảng Phong Thần (Top 5)
-                </h2>
-                <div class="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-800 px-3 py-1 rounded-md border border-slate-700">
-                    <i class="fa-solid fa-rotate animate-spin" style="animation-duration: 2s;"></i>
-                    <span id="last-update">Syncing...</span>
-                </div>
+        <!-- Cards Container -->
+        <div class="flex-1 overflow-y-auto p-8 scrollbar-hide" id="cards-container">
+            <!-- Cards will be injected here via JS -->
+            <div class="text-center py-20 text-gray-500">
+                <i class="fa-solid fa-satellite-dish text-5xl mb-4 animate-pulse text-gray-600"></i>
+                <p>Đang kết nối đến AI Core...</p>
             </div>
+        </div>
+    </main>
 
-            <div id="questions-container" class="space-y-5">
-                <!-- Loading State -->
-                <div class="text-center py-32 text-slate-500 glass-panel rounded-2xl border-dashed">
-                    <i class="fa-solid fa-satellite-dish text-5xl mb-6 text-slate-600 pulse"></i>
-                    <p class="text-lg font-medium">Đang kết nối đến AI Core...</p>
-                    <p class="text-sm mt-2">Vui lòng đảm bảo Server FastAPI đang chạy.</p>
-                </div>
+    <!-- Modal (Popup chi tiết) -->
+    <div id="detail-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-card w-full max-w-2xl rounded-xl border border-gray-700 shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-200" id="modal-content">
+            <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center bg-gray-800/50">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-users text-primary"></i> <span id="modal-title">Chi tiết cụm câu hỏi</span>
+                </h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
             </div>
-        </main>
+            <div class="p-6 overflow-y-auto max-h-[60vh] space-y-3" id="modal-list">
+                <!-- Items here -->
+            </div>
+            <div class="px-6 py-4 border-t border-gray-700 bg-gray-800/50 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors">Đóng</button>
+            </div>
+        </div>
     </div>
 
+    <!-- JavaScript Application Logic -->
     <script>
         const API_BASE = 'http://localhost:8000/api';
+        let allClusters = [];
+        let currentTab = 'academic'; // 'academic', 'admin', 'resolved'
+
+        // Khởi tạo
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchQuestions();
+            setInterval(fetchQuestions, 3000); // Tự động làm mới mỗi 3s
+        });
 
         async function fetchQuestions() {
             try {
-                const res = await fetch(`${API_BASE}/top-questions`);
+                const res = await fetch(`${API_BASE}/questions`);
                 if (!res.ok) throw new Error("Server response not ok");
                 const data = await res.json();
                 
-                document.getElementById('sim-time').innerText = data.time_hien_tai;
+                document.getElementById('timer').innerText = data.time_hien_tai;
+                allClusters = data.clusters || [];
                 
-                const container = document.getElementById('questions-container');
-                if (!data.top_5 || data.top_5.length === 0) {
-                    container.innerHTML = `
-                        <div class="glass-panel p-16 rounded-2xl text-center text-slate-400 border-dashed">
-                            <i class="fa-solid fa-mug-hot text-5xl mb-4 text-slate-600"></i>
-                            <p class="text-xl font-semibold">Tất cả câu hỏi đã được giải quyết!</p>
-                            <p class="text-sm mt-2">Giảng viên có thể yên tâm giảng bài tiếp.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = data.top_5.map((q, index) => `
-                    <div class="glass-panel rounded-2xl p-6 transition-all duration-300 hover:border-slate-400 hover:shadow-[0_0_20px_rgba(56,189,248,0.15)] flex flex-col md:flex-row gap-6 items-start md:items-center group">
-                        
-                        <!-- Rank & Score Badge -->
-                        <div class="flex flex-col items-center justify-center bg-slate-900 rounded-xl p-4 w-full md:w-32 border border-slate-700 shadow-inner shrink-0">
-                            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest mb-1">Rank #${index + 1}</span>
-                            <span class="text-3xl font-black text-white tracking-tighter">${q.score.toFixed(1)}</span>
-                            <span class="text-[9px] text-slate-600 mt-1 font-bold">Z-SCORE</span>
-                        </div>
-
-                        <!-- Question Info -->
-                        <div class="flex-1 w-full">
-                            <div class="flex flex-wrap items-center gap-2 mb-3">
-                                <span class="px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-widest shadow-sm tax-${q.taxonomy_level}">
-                                    <i class="fa-solid fa-microchip mr-1.5 opacity-70"></i>${q.taxonomy_level}
-                                </span>
-                                <span class="text-[11px] font-medium text-slate-300 bg-slate-800 px-3 py-1 rounded-full border border-slate-700 flex items-center">
-                                    <i class="fa-solid fa-users mr-1.5 text-slate-500"></i>${q.count} người cùng thắc mắc
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-medium text-slate-100 leading-relaxed">"${q.text}"</h3>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex flex-row md:flex-col gap-3 w-full md:w-auto shrink-0 mt-4 md:mt-0">
-                            <button onclick="handleAction('remove', ${index})" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-xl font-semibold transition-all shadow-[0_0_15px_rgba(5,150,105,0.4)] hover:shadow-[0_0_20px_rgba(16,185,129,0.6)] hover:-translate-y-0.5 active:translate-y-0">
-                                <i class="fa-solid fa-check text-lg"></i>
-                                <span>Đã Trả Lời</span>
-                            </button>
-                            <button onclick="handleAction('send-ta', ${index})" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 px-5 py-3 rounded-xl font-semibold border border-slate-600 transition-all hover:-translate-y-0.5 active:translate-y-0">
-                                <i class="fa-solid fa-paper-plane opacity-70"></i>
-                                <span>Gửi TA</span>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-
-                const now = new Date();
-                document.getElementById('last-update').innerText = `Ping: ${now.toLocaleTimeString()}`;
-
+                document.getElementById('server-status').innerHTML = '<i class="fa-solid fa-check text-success"></i> Đang chạy';
+                
+                updateCounts();
+                renderCards();
             } catch (err) {
                 console.error("Lỗi kết nối:", err);
+                document.getElementById('server-status').innerHTML = '<i class="fa-solid fa-xmark text-danger"></i> Lỗi kết nối';
             }
         }
 
-        async function handleAction(action, index) {
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Reset classes
+            ['academic', 'admin', 'resolved'].forEach(t => {
+                document.getElementById(`tab-${t}`).className = 'w-full flex items-center justify-between px-5 py-3 text-left transition-colors tab-inactive';
+            });
+            // Set active class
+            document.getElementById(`tab-${tab}`).className = 'w-full flex items-center justify-between px-5 py-3 text-left transition-colors tab-active';
+
+            // Update title
+            const titles = {
+                'academic': 'Danh sách câu hỏi chuyên môn',
+                'admin': 'Câu hỏi hành chính / Ngoài lề',
+                'resolved': 'Các câu hỏi đã xử lý xong'
+            };
+            document.getElementById('main-title').innerText = titles[tab];
+
+            renderCards();
+        }
+
+        function updateCounts() {
+            const acaCount = allClusters.filter(c => c.type === 'academic' && c.status === 'active').length;
+            const adminCount = allClusters.filter(c => c.type === 'admin' && c.status === 'active').length;
+            const resCount = allClusters.filter(c => c.status === 'resolved' || c.status === 'hidden').length;
+            
+            let totalScanned = 0;
+            allClusters.forEach(c => totalScanned += c.count);
+
+            document.getElementById('count-academic').innerText = acaCount;
+            document.getElementById('count-admin').innerText = adminCount;
+            document.getElementById('count-resolved').innerText = resCount;
+            document.getElementById('total-scanned').innerText = totalScanned;
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            
+            // Lọc dữ liệu dựa trên tab hiện tại
+            let displayData = [];
+            if (currentTab === 'resolved') {
+                displayData = allClusters.filter(c => c.status === 'resolved' || c.status === 'hidden');
+            } else {
+                displayData = allClusters.filter(c => c.type === currentTab && c.status === 'active');
+            }
+
+            if (displayData.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-gray-500">
+                        <i class="fa-solid fa-mug-hot text-6xl mb-4 text-gray-700"></i>
+                        <h2 class="text-xl font-bold text-gray-400">Không có dữ liệu!</h2>
+                        <p class="mt-2 text-sm">Danh sách hiện tại đang trống.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let newHTML = '';
+
+            displayData.forEach((cluster, index) => {
+                const rank = index + 1;
+                const isTop1 = rank === 1 && currentTab === 'academic';
+                
+                let borderClass = 'border-gray-800';
+                if (isTop1) borderClass = 'border-primary/50 shadow-[0_0_15px_rgba(59,130,246,0.15)] relative overflow-hidden';
+
+                // Action buttons based on tab
+                let actionButtons = '';
+                if (currentTab === 'academic') {
+                    actionButtons = `
+                        <button onclick="handleAction('${cluster.id}', 'resolve')" class="px-4 py-2 bg-success/10 text-success hover:bg-success hover:text-white border border-success/30 rounded-lg text-sm font-semibold transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-check"></i> Đã trả lời (Done)
+                        </button>
+                        <button onclick="showModal('${cluster.id}')" class="px-4 py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700 rounded-lg text-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-eye"></i> Gốc (${cluster.count})
+                        </button>
+                        <div class="w-px h-8 bg-gray-800 mx-1 self-center"></div>
+                        <button onclick="handleAction('${cluster.id}', 'trash')" class="px-4 py-2 text-danger hover:bg-danger/10 border border-transparent rounded-lg text-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-trash-can"></i> Ẩn rác
+                        </button>
+                    `;
+                } else if (currentTab === 'admin') {
+                    actionButtons = `
+                        <button onclick="handleAction('${cluster.id}', 'send-ta')" class="px-4 py-2 bg-warning/10 text-warning hover:bg-warning hover:text-white border border-warning/30 rounded-lg text-sm font-semibold transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Gửi cho TA xử lý
+                        </button>
+                        <button onclick="showModal('${cluster.id}')" class="px-4 py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700 rounded-lg text-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-eye"></i> Gốc (${cluster.count})
+                        </button>
+                    `;
+                } else if (currentTab === 'resolved') {
+                    actionButtons = `
+                        <button onclick="showModal('${cluster.id}')" class="px-4 py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700 rounded-lg text-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-eye"></i> Gốc (${cluster.count})
+                        </button>
+                        <span class="text-gray-500 text-sm flex items-center gap-2 ml-4"><i class="fa-solid fa-check-circle"></i> Đã xử lý (${cluster.status})</span>
+                    `;
+                }
+
+                newHTML += `
+                    <div class="bg-card p-6 rounded-xl border ${borderClass} mb-4 flex gap-6 items-start hover:border-gray-600 transition-all card-enter" style="animation-delay: ${index * 0.05}s" id="card-${cluster.id}">
+                        ${isTop1 ? '<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>' : ''}
+
+                        <!-- Rank Badge -->
+                        <div class="flex flex-col items-center justify-center min-w-[60px]">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${isTop1 ? 'bg-primary text-white' : 'bg-gray-800 text-gray-400'}">
+                                #${rank}
+                            </div>
+                            <span class="text-xs text-gray-500 mt-2 font-medium">Rank</span>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-1">
+                            <div class="flex flex-wrap items-center gap-3 mb-2">
+                                <span class="bg-gray-800 text-gray-300 text-xs px-2.5 py-1 rounded-md font-semibold flex items-center gap-1">
+                                    <i class="fa-solid fa-users text-[10px]"></i> ${cluster.count} lượt
+                                </span>
+                                <span class="bg-purple-900/30 text-purple-400 text-xs px-2.5 py-1 rounded-md font-semibold flex items-center gap-1 border border-purple-500/30" title="Điểm tổng hợp: 75% LLM + 25% Count">
+                                    <i class="fa-solid fa-star text-[10px]"></i> Điểm: ${cluster.total_score} (LLM: ${cluster.llm_score})
+                                </span>
+                                <span class="text-xs text-primary bg-primary/10 px-2.5 py-1 rounded-md flex items-center gap-1 border border-primary/20" title="Lý do">
+                                    <i class="fa-solid fa-robot"></i> ${cluster.reason}
+                                </span>
+                            </div>
+                            
+                            <h3 class="text-xl font-semibold text-white leading-snug mb-4">
+                                ${cluster.main_question}
+                            </h3>
+
+                            <!-- Actions -->
+                            <div class="flex flex-wrap gap-3">
+                                ${actionButtons}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = newHTML;
+        }
+
+        // Action Logic via API
+        async function handleAction(cluster_id, actionType) {
             try {
-                const res = await fetch(`${API_BASE}/action/${action}/${index}`, { method: 'POST' });
+                // UI feedback (hide card immediately for snappiness)
+                const card = document.getElementById(`card-${cluster_id}`);
+                if(card) {
+                    card.style.transform = 'scale(0.95)';
+                    card.style.opacity = '0.5';
+                }
+
+                const res = await fetch(`${API_BASE}/action/${actionType}/${cluster_id}`, { method: 'POST' });
                 const result = await res.json();
+                
                 if (result.status === 'success') {
-                    // Refresh UI immediately to feel responsive
-                    fetchQuestions();
+                    showToast(result.message);
+                    fetchQuestions(); // Refresh data from server
+                } else {
+                    alert("Lỗi: " + result.message);
+                    if(card) { card.style.transform = 'scale(1)'; card.style.opacity = '1'; }
                 }
             } catch (err) {
-                alert("Mất kết nối tới AI Core! Hãy kiểm tra lại Server Python.");
+                alert("Mất kết nối tới máy chủ.");
+                fetchQuestions();
             }
         }
 
-        // Fetch continuously every 2 seconds
-        setInterval(fetchQuestions, 2000);
-        fetchQuestions(); // Initial load
+        // Modal Logic
+        function showModal(id) {
+            const cluster = allClusters.find(c => c.id === id);
+            if(!cluster) return;
+            
+            document.getElementById('modal-title').innerText = `Câu hỏi gốc (${cluster.count} tin)`;
+            const list = document.getElementById('modal-list');
+            list.innerHTML = '';
+            
+            if (cluster.raw_messages && cluster.raw_messages.length > 0) {
+                cluster.raw_messages.forEach(msg => {
+                    list.innerHTML += `
+                        <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-gray-300 text-sm flex gap-3">
+                            <div class="text-gray-500 shrink-0"><i class="fa-solid fa-comment-dots"></i></div>
+                            <div>${msg}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                list.innerHTML = `<div class="text-gray-500 text-center py-4">Không có tin nhắn nào.</div>`;
+            }
+            
+            const modal = document.getElementById('detail-modal');
+            const content = document.getElementById('modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            const content = document.getElementById('modal-content');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
+        }
+
+        // Toast
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl border border-gray-700 font-medium text-sm flex items-center gap-3 transform translate-y-20 opacity-0 transition-all z-50';
+            toast.innerHTML = `<i class="fa-solid fa-circle-info text-primary"></i> ${msg}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.remove('translate-y-20', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
     </script>
 </body>
 </html>
-
