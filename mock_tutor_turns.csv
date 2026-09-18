@@ -1,0 +1,51 @@
+﻿turn_id,asked_at_vn,student_question
+turn_1000,2026-07-23 15:20:12,Hôm nay học đến mấy giờ thế ạ?
+turn_1001,2026-07-23 15:20:14,Chào mọi người
+turn_1002,2026-07-23 15:20:29,Learning rate là gì?
+turn_1003,2026-07-23 15:20:39,Mạng lag quá không nghe thấy gì
+turn_1004,2026-07-23 15:20:42,Tại sao cần Stochastic Gradient Descent?
+turn_1005,2026-07-23 15:20:46,Tại sao LR quá lớn thì model không hội tụ?
+turn_1006,2026-07-23 15:20:49,Tại sao classification lại dùng Cross-Entropy thay vì MSE?
+turn_1007,2026-07-23 15:20:57,Điểm danh ở đâu vậy anh trợ giảng?
+turn_1008,2026-07-23 15:21:09,"Em tính áp dụng mô hình này để dự đoán giá chứng khoán, thầy thấy có khả thi không?"
+turn_1009,2026-07-23 15:21:15,Cross-Entropy loss tính như thế nào?
+turn_1010,2026-07-23 15:21:23,Ý nghĩa của việc dùng tham số Dropout ở đây là gì?
+turn_1011,2026-07-23 15:21:35,Lỗi syntax error dòng 45
+turn_1012,2026-07-23 15:21:43,Em chạy code bị lỗi OOM (Out of memory) khi dùng batch size 64 thì nên check từ đâu?
+turn_1013,2026-07-23 15:21:53,Hàm loss function là gì vậy thầy?
+turn_1014,2026-07-23 15:22:01,Data Augmentation là gì?
+turn_1015,2026-07-23 15:22:12,Thầy ơi giải thích lại cơ chế Attention mechanism đi ạ
+turn_1016,2026-07-23 15:22:19,Dùng hàm gì để đọc file CSV trong pandas?
+turn_1017,2026-07-23 15:22:29,Epoch và Batch size khác nhau thế nào?
+turn_1018,2026-07-23 15:22:32,Tại sao df.dropna() không làm thay đổi dataframe gốc?
+turn_1019,2026-07-23 15:22:36,Gradient Descent hoạt động như thế nào?
+turn_1020,2026-07-23 15:22:51,là sao cơ?
+turn_1021,2026-07-23 15:23:06,Tại sao ta không dùng thẳng Transformer cho bài toán Time-series mà vẫn phải kết hợp CNN?
+turn_1022,2026-07-23 15:23:08,"Em thay MSE vào bài toán phân loại thì độ chính xác giảm thê thảm, sửa sao ạ?"
+turn_1023,2026-07-23 15:23:09,Bài tập về nhà nộp ở đâu ạ?
+turn_1024,2026-07-23 15:23:15,ok thầy
+turn_1025,2026-07-23 15:23:22,Thầy ơi cho em xin slide với ạ
+turn_1026,2026-07-23 15:23:25,Em không thấy màn hình share
+turn_1027,2026-07-23 15:23:40,Thầy giảng hay quá
+turn_1028,2026-07-23 15:23:46,Thầy ơi cho em đi vệ sinh xíu
+turn_1029,2026-07-23 15:23:59,Cho em xin link github của bài hôm nay
+turn_1030,2026-07-23 15:24:10,Self-attention khác gì với Attention thường?
+turn_1031,2026-07-23 15:24:17,Dạ vâng em hiểu rồi
+turn_1032,2026-07-23 15:24:22,Làm sao để chọn learning rate phù hợp cho model ResNet50?
+turn_1033,2026-07-23 15:24:31,Em lật ngang ảnh chụp X-quang y tế để augment thì có làm sai lệch bản chất bệnh lý không?
+turn_1034,2026-07-23 15:24:40,Làm sao để xử lý tập dữ liệu có 99% là nhãn 0 và 1% là nhãn 1?
+turn_1035,2026-07-23 15:24:45,Linear Regression dùng để làm gì?
+turn_1036,2026-07-23 15:24:58,So sánh ưu nhược điểm của PyTorch và TensorFlow trong môi trường production?
+turn_1037,2026-07-23 15:25:11,Tại sao chúng ta phải dùng Activation Function phi tuyến?
+turn_1038,2026-07-23 15:25:13,Trong Python khai báo mảng 2 chiều như thế nào?
+turn_1039,2026-07-23 15:25:28,Cho em hỏi xíu
+turn_1040,2026-07-23 15:25:38,Làm sao để code áp dụng thuật toán YOLO này cho tập dữ liệu ảnh y tế của em?
+turn_1041,2026-07-23 15:25:51,Em muốn lấy ảnh từ camera realtime để predict thì dùng thư viện gì OpenCV đúng ko?
+turn_1042,2026-07-23 15:25:52,Cảm ơn thầy
+turn_1043,2026-07-23 15:26:05,Mọi người có nghe rõ thầy nói không?
+turn_1044,2026-07-23 15:26:17,Thầy giải thích lại giúp em tại sao chỗ này model lại bị Overfitting được không?
+turn_1045,2026-07-23 15:26:20,"Nếu data thực tế bị nhiễu nặng thì hàm loss này không còn tối ưu, ta có thể đổi sang Huber Loss không?"
+turn_1046,2026-07-23 15:26:25,"Em nghĩ thay vì dùng LSTM ta có thể dùng 1D-CNN sẽ nhanh hơn mà độ chính xác tương đương, thầy nghĩ sao?"
+turn_1047,2026-07-23 15:26:31,Thầy ơi cho em hỏi nếu em muốn deploy mô hình lên AWS thì bắt đầu từ dịch vụ nào?
+turn_1048,2026-07-23 15:26:42,Tại sao lật ảnh lại giúp model nhận diện tốt hơn?
+turn_1049,2026-07-23 15:26:49,Có mấy loại Machine Learning cơ bản?
